@@ -7,7 +7,7 @@ import {
   CircleDollarSign, TrendingUp, UserPlus, Palette, KeyRound, Smartphone, Globe,
   MapPin, Monitor, Fingerprint, BadgeCheck, Building2, Zap, ChevronDown,
   MessageCircle, LogOut, Copy, Ban, Link2, Share2, HelpCircle, User as UserIcon,
-  Filter, CheckCircle2, AlertCircle, Inbox
+  Filter, CheckCircle2, AlertCircle, Inbox, Edit3, Upload, FileUp, RefreshCw, ExternalLink
 } from "lucide-react";
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer,
@@ -157,6 +157,14 @@ input,select,textarea{font-family:inherit}
 .fe-txt{font-size:14px;line-height:1.45}
 .fe-txt b{font-weight:700}
 .fe-time{font-size:12.5px;color:var(--muted-2);margin-top:2px}
+.doc-line{display:flex;align-items:center;gap:12px;padding:12px 6px;border-radius:10px;cursor:pointer;transition:.13s}
+.doc-line:hover{background:var(--surface-2)}
+.doc-line+.doc-line{border-top:1px solid var(--line)}
+.upload-zone{border:2px dashed var(--line-2);border-radius:16px;padding:46px 24px;text-align:center;cursor:pointer;transition:.18s;background:var(--surface-2)}
+.upload-zone:hover{border-color:var(--accent);background:var(--accent-soft)}
+.open-card{padding:20px;display:flex;flex-direction:column;gap:14px}
+.link-box{display:flex;align-items:center;gap:8px;background:var(--surface-2);border:1px solid var(--line);border-radius:11px;padding:9px 12px;font-size:13px;color:var(--ink-3);overflow:hidden}
+.link-box span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;direction:ltr;text-align:left}
 
 /* builder */
 .builder{display:grid;grid-template-columns:230px 1fr 290px;gap:18px;height:calc(100vh - 130px)}
@@ -317,28 +325,33 @@ const STATUS = {
   completed:{cls:"st-completed",label:"הושלם"}, voided:{cls:"st-voided",label:"בוטל"},
 };
 const DOCS = [
-  {id:1,title:"הסכם שכירות משנה — ארנון 5, ת״א",status:"completed",signers:2,amount:0,date:"04/06/26",by:"נתנאל"},
-  {id:2,title:"הסכם העסקה — אורי כהן",status:"partial",signers:2,amount:0,date:"02/06/26",by:"נתנאל"},
-  {id:3,title:"הצעת מחיר — שירותי שיווק דיגיטלי",status:"viewed",signers:1,amount:4800,date:"01/06/26",by:"רותם"},
-  {id:4,title:"טופס הצטרפות מטופל — מרפאת איילה",status:"sent",signers:1,amount:0,date:"31/05/26",by:"רותם"},
-  {id:5,title:"חוזה שירות חודשי — ריטיינר",status:"completed",signers:1,amount:2500,date:"28/05/26",by:"נתנאל"},
-  {id:6,title:"כתב הרשאה לחיוב חוזר",status:"draft",signers:1,amount:0,date:"27/05/26",by:"נתנאל"},
-  {id:7,title:"הסכם סודיות (NDA) — ספק",status:"voided",signers:2,amount:0,date:"24/05/26",by:"רותם"},
+  {id:1,title:"הסכם שכירות משנה — ארנון 5, ת״א",status:"completed",signers:2,date:"04/06/26",by:"נתנאל"},
+  {id:2,title:"הסכם העסקה — אורי כהן",status:"partial",signers:2,date:"02/06/26",by:"נתנאל"},
+  {id:3,title:"הסכם שיתוף פעולה — ספק",status:"viewed",signers:1,date:"01/06/26",by:"רותם"},
+  {id:4,title:"טופס הצטרפות מטופל — מרפאת איילה",status:"sent",signers:1,date:"31/05/26",by:"רותם"},
+  {id:5,title:"חוזה שירות — ריטיינר חודשי",status:"sent",signers:1,date:"28/05/26",by:"נתנאל"},
+  {id:6,title:"ייפוי כוח",status:"draft",signers:1,date:"27/05/26",by:"נתנאל"},
+  {id:7,title:"הסכם סודיות (NDA) — ספק",status:"voided",signers:2,date:"24/05/26",by:"רותם"},
 ];
 const ACTIVITY = [
   {ic:Check,tint:"completed",txt:[<b key="1">דנה לוי</b>," חתמה על ","הסכם שכירות משנה"],time:"לפני 12 דקות"},
-  {ic:CircleDollarSign,tint:"completed",txt:["התקבל תשלום של ",<b key="2">2,500 ₪</b>," — חוזה שירות חודשי"],time:"לפני שעה"},
-  {ic:Eye,tint:"viewed",txt:[<b key="3">משה ברק</b>," צפה ב","הצעת מחיר — שיווק דיגיטלי"],time:"לפני 3 שעות"},
+  {ic:Eye,tint:"viewed",txt:[<b key="3">משה ברק</b>," צפה ב","הסכם שיתוף פעולה"],time:"לפני 3 שעות"},
   {ic:Send,tint:"sent",txt:["נשלח ","טופס הצטרפות מטופל"," אל 4 נמענים"],time:"אתמול, 16:20"},
   {ic:Fingerprint,tint:"partial",txt:[<b key="4">אורי כהן</b>," אימת זהות (OTP) בהסכם העסקה"],time:"אתמול, 11:05"},
+  {ic:Globe,tint:"sent",txt:["3 נמענים חדשים חתמו דרך ",<b key="5">קישור פתוח</b>," — טופס הצטרפות"],time:"אתמול, 09:40"},
 ];
 const monthly = [
-  {m:"ינו",docs:18,rev:9200},{m:"פבר",docs:24,rev:12400},{m:"מרץ",docs:31,rev:15800},
-  {m:"אפר",docs:28,rev:14100},{m:"מאי",docs:39,rev:21600},{m:"יוני",docs:46,rev:27300},
+  {m:"ינו",docs:18},{m:"פבר",docs:24},{m:"מרץ",docs:31},
+  {m:"אפר",docs:28},{m:"מאי",docs:39},{m:"יוני",docs:46},
 ];
 const statusPie = [
-  {name:"הושלמו",value:142,color:"#0f7a58"},{name:"בהמתנה",value:38,color:"#b5710e"},
+  {name:"נחתמו",value:142,color:"#0f7a58"},{name:"ממתינים לחתימה",value:38,color:"#b5710e"},
   {name:"נצפו",value:21,color:"#2b6cb0"},{name:"טיוטות",value:14,color:"#9a978d"},
+];
+const OPEN_DOCS = [
+  {id:1,title:"טופס הצטרפות מטופל — מרפאת איילה",slug:"clinic-ayala",signed:23,active:true},
+  {id:2,title:"הסכם סודיות לעובדים חדשים",slug:"nda-staff",signed:8,active:true},
+  {id:3,title:"כתב הסכמה לדיוור",slug:"consent-mail",signed:41,active:false},
 ];
 const USERS = [
   {name:"נתנאל אזולאי",email:"netanel@easy2sign.co.il",role:"admin",last:"עכשיו"},
@@ -348,20 +361,21 @@ const USERS = [
 ];
 const TEMPLATES = [
   {id:1,title:"הסכם העסקה",fields:8,pub:false,ic:FileText},
-  {id:2,title:"הצעת מחיר + תשלום",fields:6,pub:true,ic:CreditCard},
-  {id:3,title:"טופס הצטרפות מטופל",fields:5,pub:true,ic:UserPlus},
-  {id:4,title:"NDA — הסכם סודיות",fields:4,pub:false,ic:Lock},
-  {id:5,title:"כתב הרשאה לחיוב חוזר",fields:7,pub:false,ic:CircleDollarSign},
-  {id:6,title:"הסכם שכירות",fields:11,pub:false,ic:ScrollText},
+  {id:2,title:"טופס הצטרפות מטופל",fields:5,pub:true,ic:UserPlus},
+  {id:3,title:"NDA — הסכם סודיות",fields:4,pub:true,ic:Lock},
+  {id:4,title:"ייפוי כוח",fields:7,pub:false,ic:PenTool},
+  {id:5,title:"הסכם שכירות",fields:11,pub:false,ic:ScrollText},
+  {id:6,title:"כתב הסכמה לדיוור",fields:3,pub:false,ic:CheckSquare},
 ];
 const FIELD_TYPES = [
   {type:"signature",label:"חתימה",ic:PenTool,color:"#0f7a58"},
+  {type:"initials",label:"ראשי תיבות",ic:Edit3,color:"#0c6649"},
   {type:"text",label:"שדה טקסט",ic:Type,color:"#2b6cb0"},
   {type:"date",label:"תאריך",ic:Calendar,color:"#6b3fa0"},
   {type:"checkbox",label:"תיבת סימון",ic:CheckSquare,color:"#b5710e"},
-  {type:"payment",label:"בלוק תשלום",ic:CreditCard,color:"#bd9442"},
 ];
 const SIGNER_COLORS = ["#0f7a58","#2b6cb0","#b5710e","#6b3fa0"];
+
 
 /* ============================================================ small comps */
 const Pill = ({s}) => (
@@ -394,19 +408,25 @@ function MarkTile({size=34,bg="#0f7a58",radius=9}){
 }
 
 /* ============================================================ Dashboard */
-function Dashboard({onNew,onSeeAll}){
+function Dashboard({onNew,onSeeAll,onOpenSign}){
+  const [filter,setFilter]=useState("all");
   const kpis = [
-    {ic:FileSignature,val:"46",label:"מסמכים החודש",trend:"+18%",bg:"var(--accent-soft)",c:"var(--accent)"},
-    {ic:Clock,val:"38",label:"ממתינים לחתימה",trend:"בתהליך",bg:"var(--amber-soft)",c:"var(--amber)"},
-    {ic:BadgeCheck,val:"142",label:"הושלמו ונחתמו",trend:"+24%",bg:"var(--violet-soft)",c:"var(--violet)"},
-    {ic:CircleDollarSign,val:"27,300 ₪",label:"נגבה החודש",trend:"+31%",bg:"var(--gold-soft)",c:"var(--gold)"},
+    {ic:Clock,val:"38",label:"ממתינים לחתימה",trend:"דורש מעקב",bg:"var(--amber-soft)",c:"var(--amber)"},
+    {ic:Send,val:"46",label:"נשלחו החודש",trend:"+18%",bg:"var(--blue-soft)",c:"var(--blue)"},
+    {ic:BadgeCheck,val:"142",label:"נחתמו והושלמו",trend:"+24%",bg:"var(--accent-soft)",c:"var(--accent)"},
+    {ic:Globe,val:"3",label:"קישורים פתוחים פעילים",trend:"72 חתימות",bg:"var(--violet-soft)",c:"var(--violet)"},
   ];
+  const dfilters=[["all","הכל"],["pending","ממתינים לחתימה"],["sent","נשלחו"],["completed","נחתמו"],["draft","טיוטות"]];
+  const rows=DOCS.filter(d=>filter==="all"
+    || (filter==="pending"&&["sent","viewed","partial"].includes(d.status))
+    || d.status===filter).slice(0,6);
+  const pending=DOCS.filter(d=>["viewed","partial"].includes(d.status));
   return (
     <div className="fade-up">
       <div className="page-head">
         <div>
           <div className="h1 serif">שלום נתנאל 👋</div>
-          <div className="page-sub">תמונת מצב של החתימות והתשלומים שלך ב־EASY2SIGN</div>
+          <div className="page-sub">מבט מהיר על המסמכים שנשלחו לחתימה ומה שעדיין ממתין</div>
         </div>
         <button className="btn btn-primary" onClick={onNew}><Plus size={18}/> מסמך חדש</button>
       </div>
@@ -425,66 +445,60 @@ function Dashboard({onNew,onSeeAll}){
       </div>
 
       <div className="grid-2">
+        {/* recent documents with filters */}
         <div className="card panel">
           <div className="panel-head">
-            <div className="panel-title">פעילות לאורך זמן</div>
-            <div style={{display:"flex",gap:14,fontSize:13,fontWeight:700,color:"var(--muted)"}}>
-              <span style={{color:"var(--accent)"}}>● מסמכים</span>
-              <span style={{color:"var(--gold)"}}>● הכנסות</span>
-            </div>
+            <div className="panel-title">מסמכים אחרונים</div>
+            <button className="btn btn-ghost btn-sm" onClick={onSeeAll}>הצג הכל</button>
           </div>
-          <ResponsiveContainer width="100%" height={250}>
-            <AreaChart data={monthly} margin={{right:6,left:-18,top:6}}>
-              <defs>
-                <linearGradient id="g1" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#0f7a58" stopOpacity={.32}/>
-                  <stop offset="100%" stopColor="#0f7a58" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="#eee" vertical={false}/>
-              <XAxis dataKey="m" tick={{fontSize:13,fontFamily:"Assistant"}} axisLine={false} tickLine={false} reversed/>
-              <YAxis tick={{fontSize:12}} axisLine={false} tickLine={false}/>
-              <Tooltip contentStyle={{borderRadius:12,border:"1px solid #eee",fontFamily:"Assistant",direction:"rtl"}}/>
-              <Area type="monotone" dataKey="docs" stroke="#0f7a58" strokeWidth={3} fill="url(#g1)" name="מסמכים"/>
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-
-        <div className="card panel">
-          <div className="panel-head"><div className="panel-title">פילוח סטטוסים</div></div>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={statusPie} dataKey="value" innerRadius={56} outerRadius={84} paddingAngle={3} stroke="none">
-                {statusPie.map((e,i)=><Cell key={i} fill={e.color}/>)}
-              </Pie>
-              <Tooltip contentStyle={{borderRadius:12,border:"1px solid #eee",fontFamily:"Assistant",direction:"rtl"}}/>
-            </PieChart>
-          </ResponsiveContainer>
-          <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:6}}>
-            {statusPie.map((e,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"center",gap:9,fontSize:13.5}}>
-                <span style={{width:10,height:10,borderRadius:3,background:e.color}}/>
-                <span style={{fontWeight:600}}>{e.name}</span>
-                <span style={{marginInlineStart:"auto",fontWeight:800}}>{e.value}</span>
+          <div className="filters" style={{marginBottom:14}}>
+            {dfilters.map(([k,l])=>(
+              <button key={k} className={`chip ${filter===k?"on":""}`} onClick={()=>setFilter(k)}>{l}</button>
+            ))}
+          </div>
+          <div style={{display:"flex",flexDirection:"column"}}>
+            {rows.length===0&&<div style={{padding:"30px 0",textAlign:"center",color:"var(--muted)"}}>אין מסמכים בקטגוריה זו</div>}
+            {rows.map(d=>(
+              <div key={d.id} className="doc-line" onClick={onOpenSign}>
+                <div className="doc-ic"><FileText size={18}/></div>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:700,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{d.title}</div>
+                  <div style={{fontSize:12.5,color:"var(--muted)"}}>{d.signers} חותמים · {d.date}</div>
+                </div>
+                <Pill s={d.status}/>
               </div>
             ))}
           </div>
         </div>
-      </div>
 
-      <div className="card panel">
-        <div className="panel-head"><div className="panel-title">פעילות אחרונה</div>
-          <button className="btn btn-ghost btn-sm" onClick={onSeeAll}>הצג הכל</button></div>
-        <div className="feed">
-          {ACTIVITY.map((a,i)=>{
-            const [bg,c]=tintMap[a.tint];
-            return (
-              <div className="fe" key={i}>
-                <div className="fe-ic" style={{background:bg}}><a.ic size={17} style={{color:c}}/></div>
-                <div><div className="fe-txt">{a.txt}</div><div className="fe-time">{a.time}</div></div>
+        {/* needs attention: viewed/partial not signed */}
+        <div className="card panel">
+          <div className="panel-head"><div className="panel-title">דורש את תשומת לבך</div></div>
+          <div style={{fontSize:13,color:"var(--muted)",marginBottom:14}}>נפתחו אך טרם נחתמו — שלח תזכורת</div>
+          {pending.map((d,i)=>(
+            <div key={i} style={{display:"flex",alignItems:"center",gap:11,padding:"12px 0",borderTop:i?"1px solid var(--line)":"none"}}>
+              <div className="kpi-ic" style={{width:38,height:38,background:"var(--amber-soft)"}}><Clock size={17} style={{color:"var(--amber)"}}/></div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:700,fontSize:14,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{d.title}</div>
+                <div style={{fontSize:12.5,color:"var(--muted)"}}>נשלח {d.date}</div>
               </div>
-            );
-          })}
+              <button className="btn btn-ghost btn-sm"><RefreshCw size={14}/> תזכורת</button>
+            </div>
+          ))}
+          <div style={{marginTop:18}}>
+            <div className="panel-title" style={{fontSize:15,marginBottom:12}}>פעילות אחרונה</div>
+            <div className="feed">
+              {ACTIVITY.slice(0,4).map((a,i)=>{
+                const [bg,c]=tintMap[a.tint]||["var(--paper-2)","var(--muted)"];
+                return (
+                  <div className="fe" key={i} style={{padding:"8px 0"}}>
+                    <div className="fe-ic" style={{background:bg,width:32,height:32}}><a.ic size={15} style={{color:c}}/></div>
+                    <div><div className="fe-txt" style={{fontSize:13.5}}>{a.txt}</div><div className="fe-time">{a.time}</div></div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -515,7 +529,7 @@ function Documents({onOpenSign,onBuild,toast}){
       </div>
       <div className="card" style={{padding:"20px 8px"}}>
         <table className="tbl">
-          <thead><tr><th style={{paddingRight:24}}>מסמך</th><th>סטטוס</th><th>חותמים</th><th>תשלום</th><th>נוצר</th><th></th></tr></thead>
+          <thead><tr><th style={{paddingRight:24}}>מסמך</th><th>סטטוס</th><th>חותמים</th><th>נוצר</th><th></th></tr></thead>
           <tbody>
             {rows.map(d=>(
               <tr key={d.id}>
@@ -526,7 +540,6 @@ function Documents({onOpenSign,onBuild,toast}){
                 </td>
                 <td><Pill s={d.status}/></td>
                 <td><span style={{fontWeight:700}}>{d.signers}</span> <span style={{color:"var(--muted)",fontSize:13}}>חותמים</span></td>
-                <td>{d.amount?<span style={{fontWeight:800,color:"var(--accent-ink)"}}>{d.amount.toLocaleString()} ₪</span>:<span style={{color:"var(--muted-2)"}}>—</span>}</td>
                 <td style={{color:"var(--muted)"}}>{d.date}</td>
                 <td>
                   <div className="row-acts">
@@ -558,9 +571,12 @@ function Documents({onOpenSign,onBuild,toast}){
 }
 
 /* ============================================================ Builder (drag & drop) */
-function Builder({onSend,toast}){
+function Builder({onSend,toast,startOpen}){
   const pageRef=useRef(null);
+  const fileRef=useRef(null);
+  const [doc,setDoc]=useState(null);
   const [chan,setChan]=useState("whatsapp");
+  const [openMode,setOpenMode]=useState(!!startOpen);
   const [fields,setFields]=useState([
     {id:1,type:"text",label:"שם מלא",x:12,y:18,signer:0},
     {id:2,type:"signature",label:"חתימה",x:55,y:74,signer:0},
@@ -570,20 +586,14 @@ function Builder({onSend,toast}){
     {name:"נתנאל אזולאי",role:"משכיר",email:"netanel@easy2sign.co.il"},
   ]);
   const [mode,setMode]=useState("serial");
-  const [drag,setDrag]=useState(null); // {kind:'new'|'move', type, id, label, color, gx, gy}
+  const [drag,setDrag]=useState(null);
   const [active,setActive]=useState(0);
   const nid=useRef(3);
-
   const ftMeta=t=>FIELD_TYPES.find(f=>f.type===t);
 
-  const startNew=(ft,e)=>{
-    e.preventDefault();
-    setDrag({kind:"new",type:ft.type,label:ft.label,color:ft.color,gx:e.clientX,gy:e.clientY});
-  };
-  const startMove=(f,e)=>{
-    e.preventDefault();e.stopPropagation();
-    setDrag({kind:"move",id:f.id,type:f.type,label:f.label,color:ftMeta(f.type).color,gx:e.clientX,gy:e.clientY});
-  };
+  const pickFile=e=>{const f=e.target.files?.[0]; if(f){setDoc(f.name); toast("המסמך נטען ✓");}};
+  const startNew=(ft,e)=>{e.preventDefault();setDrag({kind:"new",type:ft.type,label:ft.label,color:ft.color,gx:e.clientX,gy:e.clientY});};
+  const startMove=(f,e)=>{e.preventDefault();e.stopPropagation();setDrag({kind:"move",id:f.id,type:f.type,label:f.label,color:ftMeta(f.type).color,gx:e.clientX,gy:e.clientY});};
 
   useEffect(()=>{
     if(!drag) return;
@@ -610,13 +620,42 @@ function Builder({onSend,toast}){
   const del=id=>setFields(f=>f.filter(x=>x.id!==id));
   const addSigner=()=>setSigners(s=>[...s,{name:`חותם ${s.length+1}`,role:"תפקיד",email:""}]);
 
+  // upload screen
+  if(!doc) return (
+    <div className="fade-up">
+      <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" style={{display:"none"}} onChange={pickFile}/>
+      <div className="page-head" style={{marginBottom:16}}>
+        <div><div className="h1 serif">מסמך חדש</div><div className="page-sub">העלה מסמך, מקם שדות חתימה, ושלח לחתימה מרחוק</div></div>
+      </div>
+      <div className="card" style={{padding:30,maxWidth:760,margin:"0 auto"}}>
+        <div className="upload-zone" onClick={()=>fileRef.current?.click()}>
+          <div className="kpi-ic" style={{width:64,height:64,borderRadius:18,background:"var(--accent-soft)",margin:"0 auto 16px"}}><Upload size={30} style={{color:"var(--accent)"}}/></div>
+          <div style={{fontWeight:800,fontSize:19,marginBottom:6}}>גרור לכאן מסמך, או לחץ לבחירה</div>
+          <div style={{color:"var(--muted)",fontSize:14,marginBottom:18}}>PDF או Word (DOCX) · עד 20MB</div>
+          <button className="btn btn-primary" onClick={e=>{e.stopPropagation();fileRef.current?.click();}}><FileUp size={17}/> בחר קובץ מהמחשב</button>
+        </div>
+        <div style={{display:"flex",alignItems:"center",gap:12,margin:"22px 0"}}>
+          <div style={{flex:1,height:1,background:"var(--line)"}}/><span style={{fontSize:13,color:"var(--muted-2)"}}>או</span><div style={{flex:1,height:1,background:"var(--line)"}}/>
+        </div>
+        <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
+          <button className="btn btn-ghost" onClick={()=>{setDoc("מסמך לדוגמה.pdf");}}><FileText size={16}/> התחל ממסמך לדוגמה</button>
+          <button className="btn btn-ghost" onClick={()=>toast("בחר תבנית מהמסך 'תבניות'")}><LayoutTemplate size={16}/> התחל מתבנית</button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="fade-up">
+      <input ref={fileRef} type="file" accept=".pdf,.doc,.docx" style={{display:"none"}} onChange={pickFile}/>
       <div className="page-head" style={{marginBottom:16}}>
         <div><div className="h1 serif">בנאי המסמך</div><div className="page-sub">גרור שדות אל הדף, שייך לחותמים ושלח לחתימה</div></div>
         <div style={{display:"flex",gap:10}}>
+          <button className="btn btn-ghost" onClick={()=>{setDoc(null);}}><Upload size={16}/> החלף מסמך</button>
           <button className="btn btn-ghost" onClick={()=>toast("נשמר כתבנית ✓")}>שמור כתבנית</button>
-          <button className="btn btn-primary" onClick={onSend}><Send size={17}/> שלח לחתימה</button>
+          {openMode
+            ? <button className="btn btn-primary" onClick={()=>toast("קישור פתוח נוצר — מוכן לשיתוף ✓")}><Globe size={17}/> צור קישור פתוח</button>
+            : <button className="btn btn-primary" onClick={onSend}><Send size={17}/> שלח לחתימה</button>}
         </div>
       </div>
 
@@ -632,9 +671,9 @@ function Builder({onSend,toast}){
                 {ft.label}
               </div>
             ))}
-            <div style={{marginTop:14,padding:13,background:"var(--gold-soft)",borderRadius:12,fontSize:12.5,
-              color:"var(--ink-3)",fontWeight:600,lineHeight:1.5}}>
-              💡 שדה <b>״בלוק תשלום״</b> הופך את המסמך לחתימה+סליקה — הלקוח משלם מיד בסיום החתימה.
+            <div style={{marginTop:14,padding:13,background:"var(--accent-soft)",borderRadius:12,fontSize:12.5,
+              color:"var(--accent-ink)",fontWeight:600,lineHeight:1.5}}>
+              💡 גרור כל שדה אל הדף ושייך אותו לחותם. הצבע של השדה תואם לצבע החותם.
             </div>
           </div>
         </div>
@@ -642,8 +681,9 @@ function Builder({onSend,toast}){
         {/* canvas */}
         <div className="bcol">
           <div className="bcol-head" style={{justifyContent:"space-between"}}>
-            <span style={{display:"flex",alignItems:"center",gap:8}}><FileText size={17}/> הסכם שכירות.pdf</span>
-            <span style={{fontSize:12.5,color:"var(--muted)",fontWeight:600}}>{fields.length} שדות · עמוד 1/1</span>
+            <span style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}><FileText size={17}/>
+              <span style={{whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{doc}</span></span>
+            <span style={{fontSize:12.5,color:"var(--muted)",fontWeight:600,whiteSpace:"nowrap"}}>{fields.length} שדות · עמ׳ 1/1</span>
           </div>
           <div className="canvas-wrap">
             <div className="page" ref={pageRef}>
@@ -653,11 +693,10 @@ function Builder({onSend,toast}){
                 ))}
               </div>
               {fields.map(f=>{
-                const meta=ftMeta(f.type), col=SIGNER_COLORS[f.signer%4];
+                const meta=ftMeta(f.type), col=SIGNER_COLORS[(openMode?0:f.signer)%4];
                 return (
                   <div key={f.id} className="placed"
-                    style={{left:`${f.x}%`,top:`${f.y}%`,borderColor:col,color:col,
-                      background:`${col}0f`}}
+                    style={{left:`${f.x}%`,top:`${f.y}%`,borderColor:col,color:col,background:`${col}0f`}}
                     onPointerDown={e=>startMove(f,e)}>
                     <meta.ic size={14}/>{f.label}
                     <button className="pdel" onPointerDown={e=>e.stopPropagation()} onClick={()=>del(f.id)}><X size={13}/></button>
@@ -669,36 +708,58 @@ function Builder({onSend,toast}){
           </div>
         </div>
 
-        {/* signers */}
+        {/* signers / open mode */}
         <div className="bcol">
-          <div className="bcol-head"><Users size={17} style={{color:"var(--accent)"}}/> חותמים וסדר</div>
+          <div className="bcol-head"><Users size={17} style={{color:"var(--accent)"}}/> נמענים</div>
           <div className="bcol-body">
-            <div className="seg">
-              <button className={mode==="serial"?"on":""} onClick={()=>setMode("serial")}>סדרתי</button>
-              <button className={mode==="parallel"?"on":""} onClick={()=>setMode("parallel")}>מקבילי</button>
+            <div style={{display:"flex",alignItems:"center",gap:10,padding:12,borderRadius:11,
+              background:openMode?"var(--violet-soft)":"var(--surface-2)",border:"1px solid var(--line)",marginBottom:14}}>
+              <Globe size={18} style={{color:openMode?"var(--violet)":"var(--muted)"}}/>
+              <div style={{flex:1}}><div style={{fontWeight:700,fontSize:13.5}}>מסמך פתוח</div>
+                <div style={{fontSize:11.5,color:"var(--muted)"}}>קישור אחד לכמה נמענים</div></div>
+              <div className={`toggle ${openMode?"on":""}`} onClick={()=>setOpenMode(o=>!o)}
+                style={openMode?{background:"var(--violet)"}:{}}><i/></div>
             </div>
-            {signers.map((s,i)=>(
-              <div className="signer-row" key={i} onClick={()=>setActive(i)}
-                style={{borderColor:active===i?SIGNER_COLORS[i%4]:"var(--line)",
-                  boxShadow:active===i?`0 0 0 2px ${SIGNER_COLORS[i%4]}22`:"none",cursor:"pointer"}}>
-                <span className="signer-color" style={{background:SIGNER_COLORS[i%4]}}/>
-                {mode==="serial"&&<span style={{fontWeight:800,color:"var(--muted)",fontSize:13}}>{i+1}</span>}
-                <div className="signer-info"><div className="signer-name">{s.name}</div><div className="signer-role">{s.role}</div></div>
-                {active===i&&<Check size={16} style={{color:SIGNER_COLORS[i%4]}}/>}
-              </div>
-            ))}
-            <button className="add-line" onClick={addSigner}><UserPlus size={16}/> הוסף חותם</button>
 
-            <div style={{marginTop:18}}>
-              <span className="lbl">שליחה באמצעות</span>
-              <div style={{display:"flex",gap:7}}>
-                <button className={`chan ${chan==="email"?"on":""}`} onClick={()=>setChan("email")}><Mail size={15}/>מייל</button>
-                <button className={`chan ${chan==="sms"?"on":""}`} onClick={()=>setChan("sms")}><Smartphone size={15}/>SMS</button>
-                <button className={`chan wa ${chan==="whatsapp"?"on":""}`} onClick={()=>setChan("whatsapp")}><MessageCircle size={15}/>וואטסאפ</button>
+            {openMode ? (
+              <div style={{padding:14,border:"1px dashed var(--line-2)",borderRadius:12,background:"var(--surface-2)"}}>
+                <div style={{fontSize:13.5,fontWeight:700,marginBottom:8,color:"var(--violet)"}}>איך זה עובד?</div>
+                <div style={{fontSize:13,color:"var(--ink-3)",lineHeight:1.7}}>
+                  נוצר <b>קישור אחד</b> שאפשר לשלוח שוב ושוב לכמה אנשים שרוצים. כל מי שנכנס לקישור ממלא את פרטיו וחותם על <b>עותק אישי משלו</b> — בלי שתצטרך ליצור מסמך לכל אחד בנפרד. אידיאלי לטופסי הצטרפות, NDA לעובדים, וכו'.
+                </div>
+                <div style={{marginTop:12,display:"flex",alignItems:"center",gap:8,fontSize:12.5,color:"var(--muted)"}}>
+                  <BadgeCheck size={15} style={{color:"var(--accent)"}}/> כל חתימה מתועדת בנפרד עם OTP ו-Audit Trail
+                </div>
               </div>
-            </div>
-            <div style={{marginTop:14,display:"flex",alignItems:"center",gap:10,padding:12,
-              background:"var(--accent-soft)",borderRadius:11}}>
+            ) : (
+              <>
+                <div className="seg">
+                  <button className={mode==="serial"?"on":""} onClick={()=>setMode("serial")}>סדרתי</button>
+                  <button className={mode==="parallel"?"on":""} onClick={()=>setMode("parallel")}>מקבילי</button>
+                </div>
+                {signers.map((s,i)=>(
+                  <div className="signer-row" key={i} onClick={()=>setActive(i)}
+                    style={{borderColor:active===i?SIGNER_COLORS[i%4]:"var(--line)",
+                      boxShadow:active===i?`0 0 0 2px ${SIGNER_COLORS[i%4]}22`:"none",cursor:"pointer"}}>
+                    <span className="signer-color" style={{background:SIGNER_COLORS[i%4]}}/>
+                    {mode==="serial"&&<span style={{fontWeight:800,color:"var(--muted)",fontSize:13}}>{i+1}</span>}
+                    <div className="signer-info"><div className="signer-name">{s.name}</div><div className="signer-role">{s.role}</div></div>
+                    {active===i&&<Check size={16} style={{color:SIGNER_COLORS[i%4]}}/>}
+                  </div>
+                ))}
+                <button className="add-line" onClick={addSigner}><UserPlus size={16}/> הוסף חותם</button>
+                <div style={{marginTop:18}}>
+                  <span className="lbl">שליחה באמצעות</span>
+                  <div style={{display:"flex",gap:7}}>
+                    <button className={`chan ${chan==="email"?"on":""}`} onClick={()=>setChan("email")}><Mail size={15}/>מייל</button>
+                    <button className={`chan ${chan==="sms"?"on":""}`} onClick={()=>setChan("sms")}><Smartphone size={15}/>SMS</button>
+                    <button className={`chan wa ${chan==="whatsapp"?"on":""}`} onClick={()=>setChan("whatsapp")}><MessageCircle size={15}/>וואטסאפ</button>
+                  </div>
+                </div>
+              </>
+            )}
+
+            <div style={{marginTop:14,display:"flex",alignItems:"center",gap:10,padding:12,background:"var(--accent-soft)",borderRadius:11}}>
               <ShieldCheck size={18} style={{color:"var(--accent)"}}/>
               <span style={{fontSize:13,fontWeight:600,color:"var(--accent-ink)"}}>אימות זהות OTP מופעל</span>
               <div className="toggle on" style={{marginInlineStart:"auto"}}><i/></div>
@@ -707,7 +768,6 @@ function Builder({onSend,toast}){
         </div>
       </div>
 
-      {/* drag ghost */}
       {drag&&(
         <div className="ghost" style={{left:drag.gx+12,top:drag.gy+12,borderColor:drag.color,color:drag.color}}>
           {React.createElement(ftMeta(drag.type).ic,{size:14})}{drag.label}
@@ -749,6 +809,57 @@ function Templates({onUse,toast}){
                 {pubs[t.id]&&<button className="btn btn-ghost btn-sm" title="העתק קישור ציבורי" onClick={()=>toast("הקישור הציבורי הועתק")}><Link2 size={15}/></button>}
                 <button className="btn btn-ghost btn-sm" title="שלח בוואטסאפ" onClick={()=>toast("נשלח בוואטסאפ ✓")}><MessageCircle size={15} className="wa"/></button>
               </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ============================================================ Open documents */
+function OpenDocs({onCreate,toast}){
+  const [docs,setDocs]=useState(OPEN_DOCS);
+  const base="easy2sign.co.il/open/";
+  return (
+    <div className="fade-up">
+      <div className="page-head">
+        <div><div className="h1 serif">מסמכים פתוחים</div><div className="page-sub">קישור אחד שאפשר לשלוח שוב ושוב — כל נמען חותם על עותק אישי</div></div>
+        <button className="btn btn-primary" onClick={onCreate}><Plus size={18}/> צור מסמך פתוח</button>
+      </div>
+
+      <div style={{display:"flex",alignItems:"flex-start",gap:12,padding:16,borderRadius:14,
+        background:"var(--violet-soft)",marginBottom:22}}>
+        <Globe size={20} style={{color:"var(--violet)",flexShrink:0,marginTop:2}}/>
+        <div style={{fontSize:13.5,color:"var(--ink-3)",lineHeight:1.6}}>
+          <b>מה זה מסמך פתוח?</b> במקום לשלוח מסמך לכל אדם בנפרד, אתה יוצר קישור אחד. כל מי שנכנס אליו ממלא את פרטיו וחותם על עותק אישי משלו — מושלם לטופסי הצטרפות, NDA לעובדים, כתבי הסכמה ועוד. כל חתימה מתועדת בנפרד.
+        </div>
+      </div>
+
+      <div className="tmpl-grid">
+        {docs.map((d,i)=>(
+          <div className="card open-card fade-up" key={d.id} style={{animationDelay:`${i*50}ms`}}>
+            <div style={{display:"flex",alignItems:"center",gap:11}}>
+              <div className="kpi-ic" style={{width:42,height:42,background:d.active?"var(--violet-soft)":"var(--paper-2)"}}>
+                <Globe size={20} style={{color:d.active?"var(--violet)":"var(--muted-2)"}}/></div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontWeight:800,fontSize:15.5,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{d.title}</div>
+                <div style={{fontSize:12.5,color:"var(--muted)"}}>{d.signed} חתמו עד כה</div>
+              </div>
+            </div>
+            <div className="link-box">
+              <Link2 size={15} style={{flexShrink:0,color:"var(--muted)"}}/>
+              <span>{base}{d.slug}</span>
+            </div>
+            <div style={{display:"flex",gap:8}}>
+              <button className="btn btn-dark btn-sm" style={{flex:1,justifyContent:"center"}} onClick={()=>toast("הקישור הועתק ✓")}><Copy size={15}/> העתק קישור</button>
+              <button className="btn btn-ghost btn-sm" title="שלח בוואטסאפ" onClick={()=>toast("נשלח בוואטסאפ ✓")}><MessageCircle size={15} className="wa"/></button>
+              <button className="btn btn-ghost btn-sm" title="פתח קישור" onClick={()=>toast("פותח את הקישור הציבורי")}><ExternalLink size={15}/></button>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:9,paddingTop:4,borderTop:"1px solid var(--line)"}}>
+              <span style={{fontSize:13,fontWeight:700,color:d.active?"var(--accent-ink)":"var(--muted)"}}>{d.active?"פעיל":"מושבת"}</span>
+              <div className={`toggle ${d.active?"on":""}`} style={{marginInlineStart:"auto"}}
+                onClick={()=>setDocs(ds=>ds.map(x=>x.id===d.id?{...x,active:!x.active}:x))}><i/></div>
             </div>
           </div>
         ))}
@@ -806,7 +917,7 @@ function SettingsView({toast}){
       <div className="page-head"><div><div className="h1 serif">הגדרות</div><div className="page-sub">מיתוג, סליקה, אבטחה וסביבת העבודה</div></div></div>
       <div className="set-grid">
         <div className="set-nav">
-          {[["brand","מיתוג",Palette],["pay","סליקה ותשלומים",CreditCard],["sec","אבטחה וציות",ShieldCheck],["ws","סביבת עבודה",Building2]].map(([k,l,Ic])=>(
+          {[["brand","מיתוג",Palette],["sec","אבטחה וציות",ShieldCheck],["ws","סביבת עבודה",Building2]].map(([k,l,Ic])=>(
             <button key={k} className={tab===k?"on":""} onClick={()=>setTab(k)} style={{display:"flex",alignItems:"center",gap:10}}>
               <Ic size={17}/> {l}
             </button>
@@ -828,27 +939,6 @@ function SettingsView({toast}){
               <div style={{marginTop:20,padding:16,borderRadius:12,background:"var(--surface-2)",border:"1px solid var(--line)"}}>
                 <div style={{fontSize:12.5,color:"var(--muted)",fontWeight:700,marginBottom:10}}>תצוגה מקדימה</div>
                 <button className="btn" style={{background:color,color:"#fff"}}><PenTool size={16}/> חתום עכשיו</button>
-              </div>
-            </div>
-          )}
-          {tab==="pay"&&(
-            <div className="card panel">
-              <div className="panel-title" style={{marginBottom:6}}>שער תשלום</div>
-              <div style={{fontSize:13.5,color:"var(--muted)",marginBottom:20}}>חיבור לסליקה ישראלית לגביית תשלום בתוך מסמכים</div>
-              <div style={{display:"flex",alignItems:"center",gap:12,padding:14,border:"1.5px solid var(--accent)",
-                borderRadius:13,background:"var(--accent-soft)",marginBottom:18}}>
-                <div style={{width:42,height:42,borderRadius:10,background:"#fff",display:"grid",placeItems:"center",fontWeight:800,color:"var(--accent)"}}>TZ</div>
-                <div><div style={{fontWeight:800}}>Tranzila</div><div style={{fontSize:12.5,color:"var(--accent-ink)"}}>מחובר · טוקניזציה + חיוב חוזר</div></div>
-                <BadgeCheck size={20} style={{color:"var(--accent)",marginInlineStart:"auto"}}/>
-              </div>
-              <div className="card-grid" style={{marginBottom:14}}>
-                <div><span className="lbl">Supplier (terminal)</span><input className="inp" value="easy2sign" readOnly/></div>
-                <div><span className="lbl">API App Key</span><input className="inp" value="••••••••••3f9a" readOnly/></div>
-              </div>
-              <div style={{display:"flex",alignItems:"center",gap:11,padding:13,borderRadius:11,background:"var(--surface-2)",border:"1px solid var(--line)"}}>
-                <CircleDollarSign size={18} style={{color:"var(--gold)"}}/>
-                <span style={{fontSize:14,fontWeight:600}}>חיוב חוזר (recurring / J5)</span>
-                <div className={`toggle ${recur?"on":""}`} style={{marginInlineStart:"auto"}} onClick={()=>setRecur(!recur)}><i/></div>
               </div>
             </div>
           )}
@@ -996,8 +1086,8 @@ function SigningExperience({onClose,onToast,brand="#0f7a58"}){
             <button className="btn" disabled={!fieldsDone}
               style={{width:"100%",justifyContent:"center",marginTop:8,padding:15,fontSize:16,
                 background:fieldsDone?brand:"var(--line-2)",color:"#fff",opacity:fieldsDone?1:.7}}
-              onClick={()=>fieldsDone&&setStep("pay")}>
-              <Lock size={18}/> אשר חתימה והמשך לתשלום
+              onClick={()=>fieldsDone&&setStep("done")}>
+              <Lock size={18}/> אשר וחתום
             </button>
             <div style={{textAlign:"center",marginTop:14,fontSize:12.5,color:"var(--muted-2)"}}>
               <ShieldCheck size={13} style={{verticalAlign:"-2px",marginLeft:4}}/> החתימה תיחתם דיגיטלית ותינעל מפני עריכה
@@ -1011,42 +1101,11 @@ function SigningExperience({onClose,onToast,brand="#0f7a58"}){
           </div>
         )}
 
-        {step==="pay"&&(
-          <div className="sign-card" style={{maxWidth:430}}>
-            <div className="checkout">
-              <div className="pay-brand">
-                <div><div style={{fontSize:13,color:"var(--muted)",fontWeight:700}}>סכום לתשלום</div>
-                  <div className="amount-big">4,800 <span style={{fontSize:22}}>₪</span></div></div>
-                <div style={{textAlign:"left"}}><div style={{fontWeight:800,color:"var(--accent)"}}>Tranzila</div>
-                  <div style={{fontSize:11.5,color:"var(--muted)"}}>סליקה מאובטחת</div></div>
-              </div>
-              <div style={{marginBottom:12}}><span className="lbl">מספר כרטיס</span>
-                <div style={{position:"relative"}}>
-                  <input className="inp" placeholder="0000 0000 0000 0000" defaultValue="4580 1234 5678 9012"/>
-                  <CreditCard size={18} style={{position:"absolute",left:13,top:12,color:"var(--muted-2)"}}/>
-                </div></div>
-              <div className="card-grid" style={{marginBottom:12}}>
-                <div><span className="lbl">תוקף</span><input className="inp" placeholder="MM/YY" defaultValue="08/28"/></div>
-                <div><span className="lbl">CVV</span><input className="inp" placeholder="123" defaultValue="•••"/></div>
-              </div>
-              <div style={{marginBottom:16}}><span className="lbl">ת״ז בעל הכרטיס</span><input className="inp" placeholder="9 ספרות" defaultValue="•••••••••"/></div>
-              <button className="btn" disabled={paying}
-                style={{width:"100%",justifyContent:"center",padding:15,fontSize:16,background:brand,color:"#fff"}}
-                onClick={()=>{setPaying(true);setTimeout(()=>setStep("done"),1700);}}>
-                {paying?<><span className="spin"/> מעבד תשלום…</>:<><Lock size={18}/> שלם 4,800 ₪</>}
-              </button>
-              <div style={{textAlign:"center",marginTop:13,fontSize:12,color:"var(--muted-2)",display:"flex",gap:10,justifyContent:"center"}}>
-                <span>🔒 PCI-DSS</span><span>·</span><span>3D Secure</span><span>·</span><span>SSL</span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {step==="done"&&(
           <div className="sign-card" style={{textAlign:"center"}}>
             <div className="success-ring"><Check size={44} style={{color:brand}}/></div>
-            <div className="h1 serif" style={{fontSize:26}}>הכל הושלם! 🎉</div>
-            <p style={{color:"var(--muted)",marginTop:8,lineHeight:1.6}}>המסמך נחתם, התשלום התקבל,<br/>וההסכם ננעל בחותם דיגיטלי.</p>
+            <div className="h1 serif" style={{fontSize:26}}>נחתם בהצלחה! 🎉</div>
+            <p style={{color:"var(--muted)",marginTop:8,lineHeight:1.6}}>המסמך נחתם<br/>וננעל בחותם דיגיטלי.</p>
 
             <div className="seal" style={{margin:"24px auto"}}>
               <div style={{textAlign:"center"}}><Lock size={26}/><div style={{fontSize:10,fontWeight:800,marginTop:3}}>SEALED</div></div>
@@ -1054,7 +1113,7 @@ function SigningExperience({onClose,onToast,brand="#0f7a58"}){
 
             <div style={{background:"var(--surface-2)",border:"1px solid var(--line)",borderRadius:13,padding:16,textAlign:"right",margin:"6px 0 18px"}}>
               <div style={{fontSize:12.5,fontWeight:800,color:"var(--muted)",marginBottom:10}}>תיעוד (Audit Trail)</div>
-              {[[Fingerprint,"זהות אומתה ב-OTP","היום 14:32"],[MapPin,"IP · 82.166.xx.xx","תל אביב, IL"],[Monitor,"Chrome · macOS",""],[CircleDollarSign,"תשלום 4,800 ₪ אושר","אישור #TZ-90412"]].map(([Ic,a,b],i)=>(
+              {[[Fingerprint,"זהות אומתה ב-OTP","היום 14:32"],[MapPin,"IP · 82.166.xx.xx","תל אביב, IL"],[Monitor,"Chrome · macOS",""],[PenTool,"חתימה נקלטה ואומתה","היום 14:33"]].map(([Ic,a,b],i)=>(
                 <div key={i} style={{display:"flex",alignItems:"center",gap:10,fontSize:13,padding:"5px 0"}}>
                   <Ic size={15} style={{color:"var(--accent)"}}/><span style={{fontWeight:600}}>{a}</span>
                   {b&&<span style={{marginInlineStart:"auto",color:"var(--muted)",fontSize:12.5}}>{b}</span>}
@@ -1152,6 +1211,7 @@ export default function App(){
   const [profileOpen,setProfileOpen]=useState(false);
   const [notifOpen,setNotifOpen]=useState(false);
   const [sendOpen,setSendOpen]=useState(false);
+  const [builderOpen,setBuilderOpen]=useState(false);
   const [toasts,setToasts]=useState([]);
   const toast=useCallback((msg,ic)=>{
     const id=Math.random();
@@ -1164,6 +1224,7 @@ export default function App(){
     ["dashboard","סקירה כללית",LayoutDashboard,null],
     ["documents","מסמכים",FileSignature,"38"],
     ["builder","בנאי מסמכים",PenTool,null],
+    ["opendocs","מסמכים פתוחים",Globe,null],
     ["templates","תבניות",LayoutTemplate,null],
   ];
   const nav2=[["users","משתמשים",Users,null],["settings","הגדרות",Settings,null]];
@@ -1271,10 +1332,11 @@ export default function App(){
             </div>
           </header>
           <main className="content">
-            {view==="dashboard"&&<Dashboard onNew={()=>setView("builder")} onSeeAll={()=>setView("documents")}/>}
-            {view==="documents"&&<Documents onOpenSign={()=>setSigning(true)} onBuild={()=>setView("builder")} toast={toast}/>}
-            {view==="builder"&&<Builder onSend={()=>setSendOpen(true)} toast={toast}/>}
-            {view==="templates"&&<Templates onUse={()=>{setView("builder");toast("התבנית נטענה לבנאי");}} toast={toast}/>}
+            {view==="dashboard"&&<Dashboard onNew={()=>{setBuilderOpen(false);setView("builder");}} onSeeAll={()=>setView("documents")} onOpenSign={()=>setSigning(true)}/>}
+            {view==="documents"&&<Documents onOpenSign={()=>setSigning(true)} onBuild={()=>{setBuilderOpen(false);setView("builder");}} toast={toast}/>}
+            {view==="builder"&&<Builder onSend={()=>setSendOpen(true)} toast={toast} startOpen={builderOpen}/>}
+            {view==="opendocs"&&<OpenDocs onCreate={()=>{setBuilderOpen(true);setView("builder");toast("מצב מסמך פתוח מופעל");}} toast={toast}/>}
+            {view==="templates"&&<Templates onUse={()=>{setBuilderOpen(false);setView("builder");toast("התבנית נטענה לבנאי");}} toast={toast}/>}
             {view==="users"&&<UsersView toast={toast}/>}
             {view==="settings"&&<SettingsView toast={toast}/>}
           </main>

@@ -13,6 +13,7 @@ import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, Tooltip, CartesianGrid
 } from "recharts";
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 
 /* ============================================================
    EASY2SIGN — design system
@@ -1204,152 +1205,169 @@ function Login({onEnter}){
 }
 
 /* ============================================================ APP SHELL */
-export default function App(){
-  const [view,setView]=useState("dashboard");
-  const [signing,setSigning]=useState(false);
-  const [loggedIn,setLoggedIn]=useState(true);
+/* ============================================================ Public signing route */
+function SignFull({toast,openMode}){
+  const navigate=useNavigate();
+  return <SigningExperience onClose={()=>navigate("/")} onToast={toast} openMode={openMode}/>;
+}
+
+/* ============================================================ Admin shell (router) */
+function AdminShell({toast,onLogout}){
+  const navigate=useNavigate();
+  const loc=useLocation();
+  const path=loc.pathname;
   const [profileOpen,setProfileOpen]=useState(false);
   const [notifOpen,setNotifOpen]=useState(false);
   const [sendOpen,setSendOpen]=useState(false);
-  const [builderOpen,setBuilderOpen]=useState(false);
+  const goSign=()=>navigate("/sign/demo");
+
+  const nav=[
+    ["/","סקירה כללית",LayoutDashboard,null],
+    ["/documents","מסמכים",FileSignature,"38"],
+    ["/builder","בנאי מסמכים",PenTool,null],
+    ["/open","מסמכים פתוחים",Globe,null],
+    ["/templates","תבניות",LayoutTemplate,null],
+  ];
+  const nav2=[["/users","משתמשים",Users,null],["/settings","הגדרות",Settings,null]];
+  const active=p=> p==="/" ? path==="/" : path.startsWith(p);
+
+  const notifs=[
+    {ic:Check,bg:"var(--accent-soft)",c:"var(--accent)",t:"דנה לוי חתמה על הסכם שכירות",time:"לפני 12 דקות",unread:true},
+    {ic:Globe,bg:"var(--violet-soft)",c:"var(--violet)",t:"3 נמענים חתמו דרך קישור פתוח",time:"לפני 40 דקות",unread:true},
+    {ic:Eye,bg:"var(--blue-soft)",c:"var(--blue)",t:"משה ברק צפה בהסכם שיתוף פעולה",time:"לפני 3 שעות",unread:false},
+  ];
+
+  const openParam=new URLSearchParams(loc.search).get("open")==="1";
+
+  let page=null;
+  if(path==="/") page=<Dashboard onNew={()=>navigate("/builder")} onSeeAll={()=>navigate("/documents")} onOpenSign={goSign}/>;
+  else if(path.startsWith("/documents")) page=<Documents onOpenSign={goSign} onBuild={()=>navigate("/builder")} toast={toast}/>;
+  else if(path.startsWith("/builder")) page=<Builder onSend={()=>setSendOpen(true)} toast={toast} startOpen={openParam}/>;
+  else if(path.startsWith("/open")) page=<OpenDocs onCreate={()=>{navigate("/builder?open=1");toast("מצב מסמך פתוח מופעל");}} toast={toast}/>;
+  else if(path.startsWith("/templates")) page=<Templates onUse={()=>{navigate("/builder");toast("התבנית נטענה לבנאי");}} toast={toast}/>;
+  else if(path.startsWith("/users")) page=<UsersView toast={toast}/>;
+  else if(path.startsWith("/settings")) page=<SettingsView toast={toast}/>;
+  else page=<Dashboard onNew={()=>navigate("/builder")} onSeeAll={()=>navigate("/documents")} onOpenSign={goSign}/>;
+
+  return (
+    <div className="shell">
+      <aside className="side">
+        <div className="brand">
+          <div>
+            <Wordmark color="#ffffff" accent="#16a374" height={30}/>
+            <div className="brand-sub" style={{marginTop:7}}>SIGN · PAY · DONE</div>
+          </div>
+        </div>
+        <nav className="nav">
+          <div className="nav-label">ראשי</div>
+          {nav.map(([p,l,Ic,b])=>(
+            <button key={p} className={`nav-item ${active(p)?"on":""}`} onClick={()=>navigate(p)}>
+              <Ic size={19}/>{l}{b&&<span className="badge">{b}</span>}
+            </button>
+          ))}
+          <div className="nav-label">ניהול</div>
+          {nav2.map(([p,l,Ic])=>(
+            <button key={p} className={`nav-item ${active(p)?"on":""}`} onClick={()=>navigate(p)}>
+              <Ic size={19}/>{l}
+            </button>
+          ))}
+          <div style={{marginTop:"auto",padding:"12px",margin:12,borderRadius:14,
+            background:"linear-gradient(140deg,rgba(189,148,66,.18),rgba(189,148,66,.06))",border:"1px solid rgba(189,148,66,.25)"}}>
+            <div style={{display:"flex",alignItems:"center",gap:8,color:"#e7cf94",fontWeight:800,fontSize:13.5,marginBottom:5}}><Zap size={15}/> תוכנית Pro</div>
+            <div style={{fontSize:12,color:"#a7a9c2",lineHeight:1.5,marginBottom:10}}>87 / 200 מסמכים החודש</div>
+            <div style={{height:6,borderRadius:6,background:"rgba(255,255,255,.1)"}}><div style={{width:"43%",height:"100%",borderRadius:6,background:"var(--gold)"}}/></div>
+          </div>
+        </nav>
+        <div className="side-foot">
+          <div className="ws-card">
+            <MarkTile size={34} bg="#bd9442" radius={9}/>
+            <div style={{flex:1,minWidth:0}}><div style={{fontWeight:700,fontSize:13.5,color:"#fff"}}>EASY2SIGN בע״מ</div>
+              <div style={{fontSize:11.5,color:"#8a8ca6"}}>סביבת עבודה</div></div>
+            <ChevronDown size={16} style={{color:"#8a8ca6"}}/>
+          </div>
+        </div>
+      </aside>
+
+      <div className="main">
+        <header className="top">
+          <div className="searchbox"><Search size={17}/><input placeholder="חיפוש מסמכים, חותמים, תבניות…"/></div>
+          <div style={{marginInlineStart:"auto",display:"flex",alignItems:"center",gap:12}}>
+            <button className="btn btn-primary btn-sm" onClick={goSign}><Eye size={16}/> תצוגת חתימה</button>
+
+            <div className="dd-wrap">
+              <button className="icon-btn" onClick={()=>{setNotifOpen(o=>!o);setProfileOpen(false);}}><Bell size={19}/><span className="dot"/></button>
+              {notifOpen&&<>
+                <div style={{position:"fixed",inset:0,zIndex:55}} onClick={()=>setNotifOpen(false)}/>
+                <div className="dd left" style={{minWidth:320}}>
+                  <div className="dd-head"><span style={{fontWeight:800,fontSize:15}}>התראות</span>
+                    <button style={{fontSize:12.5,color:"var(--accent)",fontWeight:700}} onClick={()=>{setNotifOpen(false);toast("סומן הכל כנקרא");}}>סמן הכל</button></div>
+                  {notifs.map((n,i)=>(
+                    <div className="notif" key={i} onClick={()=>{setNotifOpen(false);navigate("/documents");}}>
+                      <div className="notif-ic" style={{background:n.bg}}><n.ic size={17} style={{color:n.c}}/></div>
+                      <div style={{flex:1}}><div style={{fontSize:13.5,fontWeight:600,lineHeight:1.4}}>{n.t}</div>
+                        <div style={{fontSize:12,color:"var(--muted-2)",marginTop:2}}>{n.time}</div></div>
+                      {n.unread&&<span className="unread"/>}
+                    </div>
+                  ))}
+                </div>
+              </>}
+            </div>
+
+            <div className="dd-wrap">
+              <button className="me" onClick={()=>{setProfileOpen(o=>!o);setNotifOpen(false);}}>
+                <span style={{fontWeight:700,fontSize:14}}>נתנאל</span><div className="avatar">נא</div>
+              </button>
+              {profileOpen&&<>
+                <div style={{position:"fixed",inset:0,zIndex:55}} onClick={()=>setProfileOpen(false)}/>
+                <div className="dd left">
+                  <div style={{padding:"10px 12px 12px",display:"flex",alignItems:"center",gap:11,borderBottom:"1px solid var(--line)",marginBottom:6}}>
+                    <div className="avatar" style={{width:40,height:40}}>נא</div>
+                    <div><div style={{fontWeight:800,fontSize:14.5}}>נתנאל אזולאי</div>
+                      <div style={{fontSize:12,color:"var(--muted)"}}>מנהל סביבת עבודה</div></div>
+                  </div>
+                  <button className="dd-item" onClick={()=>{setProfileOpen(false);toast("פרופיל");}}><UserIcon size={17}/> הפרופיל שלי</button>
+                  <button className="dd-item" onClick={()=>{setProfileOpen(false);navigate("/settings");}}><Settings size={17}/> הגדרות</button>
+                  <button className="dd-item" onClick={()=>{setProfileOpen(false);toast("מרכז העזרה");}}><HelpCircle size={17}/> עזרה ותמיכה</button>
+                  <div className="dd-sep"/>
+                  <button className="dd-item danger" onClick={()=>{setProfileOpen(false);onLogout();}}><LogOut size={17}/> התנתקות</button>
+                </div>
+              </>}
+            </div>
+          </div>
+        </header>
+        <main className="content">{page}</main>
+      </div>
+
+      {sendOpen&&<SendModal onClose={()=>setSendOpen(false)}
+        onSent={chan=>{setSendOpen(false);
+          toast(chan==="whatsapp"?"נשלח בוואטסאפ ✓":chan==="sms"?"נשלח ב-SMS ✓":"נשלח באימייל ✓");
+          setTimeout(()=>navigate("/sign/demo"),500);}}/>}
+    </div>
+  );
+}
+
+/* ============================================================ APP ROOT */
+export default function App(){
+  const [loggedIn,setLoggedIn]=useState(true);
   const [toasts,setToasts]=useState([]);
   const toast=useCallback((msg,ic)=>{
     const id=Math.random();
     setToasts(t=>[...t,{id,msg,ic}]);
     setTimeout(()=>setToasts(t=>t.filter(x=>x.id!==id)),2600);
   },[]);
-  const go=k=>{setView(k);setProfileOpen(false);};
 
-  const nav=[
-    ["dashboard","סקירה כללית",LayoutDashboard,null],
-    ["documents","מסמכים",FileSignature,"38"],
-    ["builder","בנאי מסמכים",PenTool,null],
-    ["opendocs","מסמכים פתוחים",Globe,null],
-    ["templates","תבניות",LayoutTemplate,null],
-  ];
-  const nav2=[["users","משתמשים",Users,null],["settings","הגדרות",Settings,null]];
-
-  const notifs=[
-    {ic:Check,bg:"var(--accent-soft)",c:"var(--accent)",t:"דנה לוי חתמה על הסכם שכירות",time:"לפני 12 דקות",unread:true},
-    {ic:CircleDollarSign,bg:"var(--gold-soft)",c:"var(--gold)",t:"התקבל תשלום 2,500 ₪",time:"לפני שעה",unread:true},
-    {ic:Eye,bg:"var(--blue-soft)",c:"var(--blue)",t:"משה ברק צפה בהצעת מחיר",time:"לפני 3 שעות",unread:false},
-  ];
-
-  if(!loggedIn) return (
-    <div className="e2s"><style>{CSS}</style><Login onEnter={()=>setLoggedIn(true)}/></div>
-  );
+  if(!loggedIn) return (<div className="e2s"><style>{CSS}</style><Login onEnter={()=>setLoggedIn(true)}/></div>);
 
   return (
     <div className="e2s">
       <style>{CSS}</style>
-      <div className="shell">
-        {/* sidebar */}
-        <aside className="side">
-          <div className="brand">
-            <div>
-              <Wordmark color="#ffffff" accent="#16a374" height={30}/>
-              <div className="brand-sub" style={{marginTop:7}}>SIGN · PAY · DONE</div>
-            </div>
-          </div>
-          <nav className="nav">
-            <div className="nav-label">ראשי</div>
-            {nav.map(([k,l,Ic,b])=>(
-              <button key={k} className={`nav-item ${view===k?"on":""}`} onClick={()=>setView(k)}>
-                <Ic size={19}/>{l}{b&&<span className="badge">{b}</span>}
-              </button>
-            ))}
-            <div className="nav-label">ניהול</div>
-            {nav2.map(([k,l,Ic])=>(
-              <button key={k} className={`nav-item ${view===k?"on":""}`} onClick={()=>setView(k)}>
-                <Ic size={19}/>{l}
-              </button>
-            ))}
-            <div style={{marginTop:"auto",padding:"12px",margin:12,borderRadius:14,
-              background:"linear-gradient(140deg,rgba(189,148,66,.18),rgba(189,148,66,.06))",border:"1px solid rgba(189,148,66,.25)"}}>
-              <div style={{display:"flex",alignItems:"center",gap:8,color:"#e7cf94",fontWeight:800,fontSize:13.5,marginBottom:5}}><Zap size={15}/> תוכנית Pro</div>
-              <div style={{fontSize:12,color:"#a7a9c2",lineHeight:1.5,marginBottom:10}}>87 / 200 מסמכים החודש</div>
-              <div style={{height:6,borderRadius:6,background:"rgba(255,255,255,.1)"}}><div style={{width:"43%",height:"100%",borderRadius:6,background:"var(--gold)"}}/></div>
-            </div>
-          </nav>
-          <div className="side-foot">
-            <div className="ws-card">
-              <MarkTile size={34} bg="#bd9442" radius={9}/>
-              <div style={{flex:1,minWidth:0}}><div style={{fontWeight:700,fontSize:13.5,color:"#fff"}}>EASY2SIGN בע״מ</div>
-                <div style={{fontSize:11.5,color:"#8a8ca6"}}>סביבת עבודה</div></div>
-              <ChevronDown size={16} style={{color:"#8a8ca6"}}/>
-            </div>
-          </div>
-        </aside>
-
-        {/* main */}
-        <div className="main">
-          <header className="top">
-            <div className="searchbox"><Search size={17}/><input placeholder="חיפוש מסמכים, חותמים, תבניות…"/></div>
-            <div style={{marginInlineStart:"auto",display:"flex",alignItems:"center",gap:12}}>
-              <button className="btn btn-primary btn-sm" onClick={()=>setSigning(true)}><Eye size={16}/> תצוגת חתימה</button>
-
-              {/* notifications */}
-              <div className="dd-wrap">
-                <button className="icon-btn" onClick={()=>{setNotifOpen(o=>!o);setProfileOpen(false);}}><Bell size={19}/><span className="dot"/></button>
-                {notifOpen&&<>
-                  <div style={{position:"fixed",inset:0,zIndex:55}} onClick={()=>setNotifOpen(false)}/>
-                  <div className="dd left" style={{minWidth:320}}>
-                    <div className="dd-head"><span style={{fontWeight:800,fontSize:15}}>התראות</span>
-                      <button style={{fontSize:12.5,color:"var(--accent)",fontWeight:700}} onClick={()=>{setNotifOpen(false);toast("סומן הכל כנקרא");}}>סמן הכל</button></div>
-                    {notifs.map((n,i)=>(
-                      <div className="notif" key={i} onClick={()=>{setNotifOpen(false);go("documents");}}>
-                        <div className="notif-ic" style={{background:n.bg}}><n.ic size={17} style={{color:n.c}}/></div>
-                        <div style={{flex:1}}><div style={{fontSize:13.5,fontWeight:600,lineHeight:1.4}}>{n.t}</div>
-                          <div style={{fontSize:12,color:"var(--muted-2)",marginTop:2}}>{n.time}</div></div>
-                        {n.unread&&<span className="unread"/>}
-                      </div>
-                    ))}
-                  </div>
-                </>}
-              </div>
-
-              {/* profile */}
-              <div className="dd-wrap">
-                <button className="me" onClick={()=>{setProfileOpen(o=>!o);setNotifOpen(false);}}>
-                  <span style={{fontWeight:700,fontSize:14}}>נתנאל</span><div className="avatar">נא</div>
-                </button>
-                {profileOpen&&<>
-                  <div style={{position:"fixed",inset:0,zIndex:55}} onClick={()=>setProfileOpen(false)}/>
-                  <div className="dd left">
-                    <div style={{padding:"10px 12px 12px",display:"flex",alignItems:"center",gap:11,borderBottom:"1px solid var(--line)",marginBottom:6}}>
-                      <div className="avatar" style={{width:40,height:40}}>נא</div>
-                      <div><div style={{fontWeight:800,fontSize:14.5}}>נתנאל אזולאי</div>
-                        <div style={{fontSize:12,color:"var(--muted)"}}>מנהל סביבת עבודה</div></div>
-                    </div>
-                    <button className="dd-item" onClick={()=>{setProfileOpen(false);toast("פרופיל");}}><UserIcon size={17}/> הפרופיל שלי</button>
-                    <button className="dd-item" onClick={()=>go("settings")}><Settings size={17}/> הגדרות</button>
-                    <button className="dd-item" onClick={()=>{setProfileOpen(false);toast("מרכז העזרה");}}><HelpCircle size={17}/> עזרה ותמיכה</button>
-                    <div className="dd-sep"/>
-                    <button className="dd-item danger" onClick={()=>{setProfileOpen(false);setSigning(false);setLoggedIn(false);}}><LogOut size={17}/> התנתקות</button>
-                  </div>
-                </>}
-              </div>
-            </div>
-          </header>
-          <main className="content">
-            {view==="dashboard"&&<Dashboard onNew={()=>{setBuilderOpen(false);setView("builder");}} onSeeAll={()=>setView("documents")} onOpenSign={()=>setSigning(true)}/>}
-            {view==="documents"&&<Documents onOpenSign={()=>setSigning(true)} onBuild={()=>{setBuilderOpen(false);setView("builder");}} toast={toast}/>}
-            {view==="builder"&&<Builder onSend={()=>setSendOpen(true)} toast={toast} startOpen={builderOpen}/>}
-            {view==="opendocs"&&<OpenDocs onCreate={()=>{setBuilderOpen(true);setView("builder");toast("מצב מסמך פתוח מופעל");}} toast={toast}/>}
-            {view==="templates"&&<Templates onUse={()=>{setBuilderOpen(false);setView("builder");toast("התבנית נטענה לבנאי");}} toast={toast}/>}
-            {view==="users"&&<UsersView toast={toast}/>}
-            {view==="settings"&&<SettingsView toast={toast}/>}
-          </main>
-        </div>
-      </div>
-
-      {sendOpen&&<SendModal onClose={()=>setSendOpen(false)}
-        onSent={chan=>{setSendOpen(false);
-          toast(chan==="whatsapp"?"נשלח בוואטסאפ ✓":chan==="sms"?"נשלח ב-SMS ✓":"נשלח באימייל ✓");
-          setTimeout(()=>setSigning(true),500);}}/>}
-
-      {signing&&<SigningExperience onClose={()=>setSigning(false)} onToast={toast}/>}
-
+      <BrowserRouter>
+        <Routes>
+          <Route path="/sign/:token" element={<SignFull toast={toast}/>}/>
+          <Route path="/open/:slug" element={<SignFull toast={toast} openMode/>}/>
+          <Route path="/*" element={<AdminShell toast={toast} onLogout={()=>setLoggedIn(false)}/>}/>
+        </Routes>
+      </BrowserRouter>
       <div className="toast-wrap">
         {toasts.map(t=>(<div className="toast" key={t.id}>{t.ic||<CheckCircle2 size={18} style={{color:"#56d6a0"}}/>}{t.msg}</div>))}
       </div>
